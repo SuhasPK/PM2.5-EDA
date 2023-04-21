@@ -49,4 +49,8 @@ po/*~
 rsconnect/
 
 # raw data
-exdata_data_NEI_data/
+Source_Classification_Code.rds/
+summarySCC_PM25.rds/
+
+# data set
+data.zip/
