@@ -56,6 +56,48 @@ plot(Baltimore_total_emission, type = "b",
 )
 dev.off()
 
+# Plot using ggplot2. PLOT3
+library(ggplot2)
+library(plyr)
+
+if (!"Bltmr_data" %in% ls()){
+    Bltmr_data <- ddply(Baltimore_data, .(type, year),
+                        summarise, 
+                        TotalEmission = sum(Emissions))
+}
+
+png(filename = 'Plot3.png', width =720, height =720, units = 'px')
+ggplot(Bltmr_data, aes(year,TotalEmission, color = type)) + geom_line() + geom_point() + labs(title = expression('Total PM'[2.5]*" Emissions in Baltimore City, Maryland from 1999 to 2008"),x = "Year",y = expression('Total PM'[2.5]*"Emission (in tons)"))
+dev.off()
+
+# Coal combustion changed from 1999-2008. PLOT4
+View(SCC)
+if (!"Coal_NEI" %in% ls()){
+    coal <- SCC[grep("Comb.*Coal", SCC$Short.Name),"SCC"]
+    Coal_NEI <- NEI[NEI$SCC %in% coal,]
+}
+if (!"Combustion_data" %in% ls()){
+    Combustion_data <- ddply(Coal_NEI, .(year), summarise, Total_emission = sum(Emissions))
+}
+
+png(filename = "Plot4.png", width = 720, height=720, units = "px" )
+ggplot(Combustion_data,aes(year, Total_emission))+
+    geom_line(color = "red") +geom_point()+
+    labs(title = "Total Emissions from Coal Combustion-Related Sources", x = "Year", y = "Total Emissions")
+dev.off()
+
+# Motor Vehicle. PLOT5
+if (!"motor" %in% ls()){
+    motor <- ddply(
+        NEI[NEI$fips == "24510" & NEI$type == "ON-ROAD",], .(type,year),summarise, total_emission = sum(Emissions)
+    )
+}
+png(filename = "Plot5.png", width = 720, height = 720, units = "px")
+ggplot(motor, aes(year, total_emission))+ 
+    geom_line(color="green")+
+    geom_point()+
+    labs(title = "Total Emissions from Motor Vehicles in Baltimore City", x = "Year", y = "Total Emissions") + theme(text = element_text(size = 14))
+dev.off()
 
 
 
