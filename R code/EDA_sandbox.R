@@ -99,5 +99,26 @@ ggplot(motor, aes(year, total_emission))+
     labs(title = "Total Emissions from Motor Vehicles in Baltimore City", x = "Year", y = "Total Emissions") + theme(text = element_text(size = 14))
 dev.off()
 
+# Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"fips == "06037").
+# Which city has seen greater changes over time in motor vehicle emissions?
+# Plot6.
+library(scales)
+bltmr <- NEI[(NEI$fips=="24510"), ]
+bltmr <- aggregate(Emissions~year, data = bltmr, FUN = sum)
+la <- NEI[(NEI$fips=="06037"),]
+la <- aggregate(Emissions~year, data = la, FUN = sum)
+bltmr$county <- "Baltimore"
+la$county <- "Los Angeles"
+data <- rbind(bltmr,la)
+func <- function(){
+    f <- function(x) as.character(round(x,2))
+    f
+}
+png(filename = "Plot6.png",width=720,height=720,units="px")
+ggplot(data, aes(x=factor(year),y=Emissions,fill=county))+
+    geom_bar(aes(fill=county),position = "dodge", stat = "identity")+
+    labs(y = expression("Total Emissions (in log scale) of PM"[2.5])) + xlab("year") + ggtitle(expression("Motor vehicle emission in Baltimore and Los Angeles")) + scale_y_continuous(trans = log_trans(), labels = func())
+dev.off()
 
 
+ 
